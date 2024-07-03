@@ -1,12 +1,11 @@
 import { Router } from 'express'
-import { getAll, getOneById, getOneByEmail, store, update, remove } from './user.controller'
-import { userSchemaPOST, userSchemaPUT } from '../users/user.schema'
+import { getAll, getOneById, store, update, remove } from './book.controller'
+import { bookSchemaPOST, bookSchemaPUT } from '../books/book.schema'
 import { validateSchema } from '../../middleware/validateSchema'
-import { isAuthenticated } from '../../middleware/isAuthenticated'
 
 const router = Router()
 
-router.get('/', isAuthenticated, async (req, res) => 
+router.get('/', async (req, res) => 
 {
     try
     {
@@ -19,7 +18,7 @@ router.get('/', isAuthenticated, async (req, res) =>
     }
 })
 
-router.get('/:id', isAuthenticated, async (req, res) => 
+router.get('/:id', async (req, res) => 
 {
     try
     {
@@ -32,11 +31,11 @@ router.get('/:id', isAuthenticated, async (req, res) =>
     }
 })
 
-router.get('/:email', isAuthenticated, async (req, res) => 
+router.post('/', validateSchema(bookSchemaPOST), async (req, res) => 
 {
     try
     {
-        const result = await getOneByEmail({ email: req.params.email });
+        const result = await store({ title: req.body.title, category: req.body.category });
         return res.json(result);
     }
     catch (error: any)
@@ -45,21 +44,7 @@ router.get('/:email', isAuthenticated, async (req, res) =>
     }
 })
 
-router.post('/', isAuthenticated, validateSchema(userSchemaPOST), async (req, res) => 
-{
-    try
-    {
-        const result = await store({ name: req.body.name, email: req.body.email, password: req.body.password,
-                                    isAdmin: req.body.isAdmin });
-        return res.json(result);
-    }
-    catch (error: any)
-    {
-        return res.status(401).json({ error: error.message });
-    }
-})
-
-router.put('/:id', isAuthenticated, validateSchema(userSchemaPUT), async (req, res) => 
+router.put('/:id', validateSchema(bookSchemaPUT), async (req, res) => 
 {
     try
     {
@@ -72,7 +57,7 @@ router.put('/:id', isAuthenticated, validateSchema(userSchemaPUT), async (req, r
     }
 })
 
-router.delete('/:id', isAuthenticated, async (req, res) => 
+router.delete('/:id', async (req, res) => 
 {
     try
     {
